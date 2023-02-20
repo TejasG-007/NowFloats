@@ -1,16 +1,5 @@
-# weather
+---------------------Running Instruction---------------------------<\br> 1.Download the project in your local computer.<\br>
+ 2.Open the project in android studio or VS studio code.\n 3.Make sure to have flutter SDK and android emulator or simulator(device).<\br>
+ 4.use the following cmd to run the project<\br> >flutter pub get //to fetch dependencies<\br> >flutter run app // to run app\n
 
-weather app
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+--------------------------------------------------------------------<\br>
