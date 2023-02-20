@@ -22,22 +22,33 @@ class WeatherProvider with ChangeNotifier {
 
   get getFav=>_favouriteList;
 
-   setFav(Weather? data){
-    _favouriteList.add(data);
-    savedFavList();
-    getsavedFavList();
-    notifyListeners();
+  get favLength=>_favouriteList.length;
+
+   bool setFav(Weather? data){
+   for(Weather? check in _favouriteList){
+     if((data!.cityName==check!.cityName)){
+       return false;
+     }
+   }
+     _favouriteList.add(data);
+     notifyListeners();
+     return true;
+
 
   }
 
   remFav(Weather? data){
     _favouriteList.removeWhere((e)=>e?.cityName==data?.cityName);
     notifyListeners();
+    return true;
   }
 
+  clearList(){
+     _favouriteList.clear();
+     notifyListeners();
+  }
   bool checker(String name){
      Iterable<bool> itr = _favouriteList.map((e) => e?.cityName==name?true:false);
-     notifyListeners();
      return itr.contains(true)? true: false;
   }
 
@@ -67,23 +78,60 @@ class WeatherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
-
-  Future<void> savedFavList()async{
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    List<Map<String,dynamic>> JsonData = _favouriteList.map((e) => {"cityName":e!.cityName,"description":e!.description,"temperature":e!.temperature}).toList();
-    await pref.setString("fav", JsonData.toString());
-    notifyListeners();
+  Future<void> removeFromSavedList()async{
+    try{
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      await pref.remove("fav");
+      List<String> tosaveList = [];
+      for(Weather? data in _favouriteList){
+        Map<String,dynamic> map = {
+          "cityName":data!.cityName,
+          "temperature":data!.temperature.toString(),
+          "description":data!.description,
+        };
+        final String jData = jsonEncode(map);
+        tosaveList.add(jData.toString());
+      }
+      await pref.setStringList("fav", tosaveList);
+    }catch(e){
+      throw Exception("Unable to Save data$e");
+    }
   }
 
-  Future<void> getsavedFavList()async{
-    SharedPreferences pref = await SharedPreferences.getInstance();
-   var data = await pref.getString("fav");
-   final re = RegExp(r"/[^,]+,[^,]+,[^,]+/g");
-   print("${re.allMatches(data!)} here is the matchers");
-   var ss = data?.split(r"/[^,]+,[^,]+,[^,]+/g");
-    print("saved list${data}\n${ss}");
-    notifyListeners();
+  Future<void> savedFavList()async{
+    try{
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      List<String> tosaveList = [];
+      for(Weather? data in _favouriteList){
+        Map<String,dynamic> map = {
+          "cityName":data!.cityName,
+          "temperature":data!.temperature.toString(),
+          "description":data!.description,
+        };
+        final String jData = jsonEncode(map);
+        tosaveList.add(jData.toString());
+      }
+      await pref.setStringList("fav", tosaveList);
+    }catch(e){
+      throw Exception("Unable to Save data$e");
+    }
+  }
+
+  Future<void> getSavedFavList()async{
+    try{
+
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      List<String>? jData =  pref.getStringList("fav");
+      jData?.toSet().toList();
+      for(String data in jData!){
+        Map<String,dynamic> rawtoJ = jsonDecode(data);
+        Weather obj = Weather(cityName: rawtoJ["cityName"], temperature: double.parse(rawtoJ["temperature"]), description: rawtoJ["description"]);
+        setFav(obj);
+      }
+    }catch(e){
+      throw Exception("Unable to fetch data $e");
+    }
+
   }
 
 
